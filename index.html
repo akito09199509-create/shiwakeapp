@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>簿記10分ドリル</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="side-panel">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+          <div>
+            <h1>簿記10分ドリル</h1>
+            <p>簿記論 計算トレーナー</p>
+          </div>
+        </div>
+
+        <section class="control-group">
+          <h2>ドリル</h2>
+          <label>
+            時間
+            <select id="durationSelect">
+              <option value="5">5分</option>
+              <option value="10" selected>10分</option>
+              <option value="15">15分</option>
+              <option value="20">20分</option>
+            </select>
+          </label>
+          <label>
+            問数
+            <select id="countSelect">
+              <option value="6">6問</option>
+              <option value="10" selected>10問</option>
+              <option value="15">15問</option>
+              <option value="20">20問</option>
+              <option value="30">30問</option>
+              <option value="50">50問</option>
+            </select>
+          </label>
+          <label>
+            難度
+            <select id="levelSelect">
+              <option value="basic">基礎</option>
+              <option value="standard" selected>標準</option>
+              <option value="mixed">総合</option>
+            </select>
+          </label>
+          <label class="toggle-line">
+            <input id="weakOnlyCheck" type="checkbox">
+            <span>弱点テーマ優先</span>
+          </label>
+          <label class="toggle-line">
+            <input id="examModeCheck" type="checkbox">
+            <span>試験前モード</span>
+          </label>
+        </section>
+
+        <section class="control-group topic-group">
+          <div class="group-title-row">
+            <h2>テーマ</h2>
+            <button id="toggleTopicsButton" class="icon-button" type="button" title="テーマを全選択/解除">↕</button>
+          </div>
+          <div id="topicChecks" class="topic-list"></div>
+        </section>
+
+        <section class="control-group stats-panel">
+          <h2>記録</h2>
+          <div class="stat-line">
+            <span>正答</span>
+            <strong id="overallRate">0%</strong>
+          </div>
+          <div class="stat-line">
+            <span>演習数</span>
+            <strong id="overallCount">0</strong>
+          </div>
+          <div class="stat-line">
+            <span>平均時間</span>
+            <strong id="averageTime">-</strong>
+          </div>
+          <div class="stat-line">
+            <span>復習待ち</span>
+            <strong id="reviewDueCount">0</strong>
+          </div>
+          <div class="stat-line">
+            <span>お気に入り</span>
+            <strong id="favoriteCount">0</strong>
+          </div>
+          <div id="weakList" class="weak-list"></div>
+          <button id="reviewButton" class="ghost-button" type="button">間違い復習を開始</button>
+          <button id="favoriteDrillButton" class="ghost-button" type="button">お気に入りを開始</button>
+          <button id="resetStatsButton" class="ghost-button" type="button">記録リセット</button>
+        </section>
+      </aside>
+
+      <main class="main-panel">
+        <header class="top-bar">
+          <div class="timer-block">
+            <span class="label">残り</span>
+            <strong id="timerText">10:00</strong>
+          </div>
+          <div class="progress-block">
+            <span id="questionProgress">0 / 0</span>
+            <div class="meter" aria-hidden="true"><span id="progressMeter"></span></div>
+          </div>
+          <div class="score-block">
+            <span class="label">スコア</span>
+            <strong id="scoreText">0</strong>
+          </div>
+          <div class="top-actions">
+            <button id="startButton" class="primary-button" type="button">開始</button>
+            <button id="newSetButton" class="secondary-button" type="button">作り直し</button>
+          </div>
+        </header>
+
+        <section class="problem-area">
+          <div class="problem-head">
+            <div>
+              <div id="problemMeta" class="meta-row"></div>
+              <h2 id="problemTitle">開始を押すと問題が出ます</h2>
+            </div>
+            <div class="problem-tools">
+              <button id="favoriteButton" class="icon-button" type="button" title="お気に入り">☆</button>
+              <button id="hintButton" class="icon-button" type="button" title="ヒント">?</button>
+            </div>
+          </div>
+          <p id="problemText" class="problem-text">PDFの範囲を参考に、10分で回せる仕訳・金額算定問題をランダム生成します。</p>
+          <p id="hintText" class="hint-text" hidden></p>
+        </section>
+
+        <section class="answer-area">
+          <div class="journal-grid">
+            <div class="journal-side">
+              <div class="journal-title">
+                <span>借方</span>
+                <button id="addDebitButton" class="icon-button mini" type="button" title="借方行を追加">+</button>
+              </div>
+              <div id="debitRows" class="entry-rows"></div>
+            </div>
+            <div class="journal-side">
+              <div class="journal-title">
+                <span>貸方</span>
+                <button id="addCreditButton" class="icon-button mini" type="button" title="貸方行を追加">+</button>
+              </div>
+              <div id="creditRows" class="entry-rows"></div>
+            </div>
+          </div>
+
+          <div id="calcAnswerArea" class="calc-answer-area" hidden>
+            <div class="calc-title">
+              <span>解答金額</span>
+              <small>半角数字・カンマ入力可</small>
+            </div>
+            <div id="calcRows" class="calc-rows"></div>
+          </div>
+
+          <div id="balanceMessage" class="balance-message">借方合計 0 / 貸方合計 0</div>
+
+          <div class="answer-actions">
+            <button id="checkButton" class="primary-button" type="button">採点</button>
+            <button id="revealButton" class="secondary-button" type="button">解答</button>
+            <button id="retrySimilarButton" class="secondary-button" type="button">類題</button>
+            <button id="nextButton" class="secondary-button" type="button">次へ</button>
+          </div>
+        </section>
+
+        <section id="solutionPanel" class="solution-panel" hidden>
+          <div class="solution-head">
+            <h2 id="resultTitle">解答</h2>
+            <span id="resultBadge"></span>
+          </div>
+          <div id="solutionTable" class="solution-table"></div>
+          <div id="solutionNote" class="solution-note"></div>
+          <div class="memory-tools">
+            <label for="noteInput">メモ</label>
+            <textarea id="noteInput" class="note-input" rows="3"></textarea>
+            <button id="saveNoteButton" class="secondary-button" type="button">保存</button>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
